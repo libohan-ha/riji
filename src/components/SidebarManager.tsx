@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Plus, Trash2, RotateCcw, FolderPlus } from 'lucide-react'
+import { X, Trash2, RotateCcw, FolderPlus } from 'lucide-react'
 import { useSidebar } from '../contexts/SidebarContext'
 
 const icons = [
@@ -13,7 +13,7 @@ interface SidebarManagerProps {
 }
 
 export function SidebarManager({ onClose }: SidebarManagerProps) {
-  const { items, addItem, removeItem, updateItem, resetToDefault } = useSidebar()
+  const { items, addItem, removeItem, resetToDefault } = useSidebar()
   const [newItemForm, setNewItemForm] = useState({
     label: '',
     icon: 'Star'

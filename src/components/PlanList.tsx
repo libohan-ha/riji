@@ -1,4 +1,4 @@
-import { Trash2, Circle, CheckCircle2 } from 'lucide-react'
+import { CalendarCheck2, Trash2, Circle, CheckCircle2 } from 'lucide-react'
 import { Plan } from '../types'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'

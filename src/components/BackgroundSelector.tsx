@@ -45,6 +45,7 @@ export function BackgroundSelector({ onClose }: BackgroundSelectorProps) {
     const theme = backgroundThemes.find(t => t.id === themeId)
     if (!theme) return
 
+    const root = document.documentElement
     const body = document.body
 
     // Reset previous styles

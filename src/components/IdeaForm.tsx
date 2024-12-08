@@ -8,22 +8,20 @@ interface IdeaFormProps {
 }
 
 export function IdeaForm({ onAdd }: IdeaFormProps) {
-  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!title.trim()) return
+    if (!content.trim()) return
 
     const idea: Idea = {
       id: crypto.randomUUID(),
-      title: title.trim(),
-      content: '',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      content: content.trim(),
+      createdAt: new Date().toISOString()
     }
 
     onAdd(idea)
-    setTitle('')
+    setContent('')
     toast.success('灵感已记录')
   }
 
@@ -37,14 +35,14 @@ export function IdeaForm({ onAdd }: IdeaFormProps) {
       <div className="flex gap-2">
         <input
           type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
           placeholder="记录一个新的灵感..."
           className="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         />
         <button
           type="submit"
-          disabled={!title.trim()}
+          disabled={!content.trim()}
           className="rounded-lg bg-blue-500 px-4 py-2 text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
         >
           添加

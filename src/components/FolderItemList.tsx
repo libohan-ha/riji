@@ -1,4 +1,4 @@
-import { StickyNote, ListTodo, Trash2, Edit, Check, ChevronDown, ChevronUp } from 'lucide-react'
+import { StickyNote, Trash2, Edit, Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { FolderItem } from '../types'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'

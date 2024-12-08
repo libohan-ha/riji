@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Todo } from '../types'
 import { motion, AnimatePresence } from 'framer-motion'
-import { TimerReset, Trash2, CheckCircle2, Check, X } from 'lucide-react'
-import TextareaAutosize from 'react-textarea-autosize'
+import { TimerReset, Trash2, CheckCircle2 } from 'lucide-react'
+import { EditDrawer } from './EditDrawer'
 
 interface TodoListProps {
   todos: Todo[]
@@ -15,6 +15,7 @@ export function TodoList({ todos, onDelete, onComplete, onEdit }: TodoListProps)
   const [timeLeft, setTimeLeft] = useState<Record<string, number>>({})
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editContent, setEditContent] = useState('')
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -63,27 +64,14 @@ export function TodoList({ todos, onDelete, onComplete, onEdit }: TodoListProps)
   const startEditing = (todo: Todo) => {
     setEditingId(todo.id)
     setEditContent(todo.content)
+    setIsDrawerOpen(true)
   }
 
-  const cancelEditing = () => {
-    setEditingId(null)
-    setEditContent('')
-  }
-
-  const saveEdit = () => {
-    if (!editingId || !editContent.trim()) return
-    onEdit(editingId, editContent.trim())
-    setEditingId(null)
-    setEditContent('')
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      saveEdit()
-    }
-    if (e.key === 'Escape') {
-      cancelEditing()
+  const handleSave = () => {
+    if (editingId && editContent.trim()) {
+      onEdit(editingId, editContent.trim())
+      setEditingId(null)
+      setIsDrawerOpen(false)
     }
   }
 
@@ -123,49 +111,13 @@ export function TodoList({ todos, onDelete, onComplete, onEdit }: TodoListProps)
                 </button>
 
                 <div className="flex-1 min-w-0">
-                  {editingId === todo.id ? (
-                    <div className="space-y-2">
-                      <TextareaAutosize
-                        minRows={1}
-                        maxRows={5}
-                        value={editContent}
-                        onChange={(e) => setEditContent(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        className="w-full rounded-lg border border-blue-300 px-3 py-2
-                                 focus:outline-none focus:ring-2 focus:ring-blue-500
-                                 resize-none bg-white/50"
-                        autoFocus
-                      />
-                      <div className="flex gap-2">
-                        <button
-                          onClick={saveEdit}
-                          className="flex items-center gap-1 px-3 py-1 rounded-lg
-                                   bg-green-500 text-white hover:bg-green-600
-                                   transition-colors text-sm"
-                        >
-                          <Check size={16} />
-                          保存
-                        </button>
-                        <button
-                          onClick={cancelEditing}
-                          className="flex items-center gap-1 px-3 py-1 rounded-lg
-                                   bg-gray-200 text-gray-600 hover:bg-gray-300
-                                   transition-colors text-sm"
-                        >
-                          <X size={16} />
-                          取消
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <p 
-                      onClick={() => startEditing(todo)}
-                      className="text-gray-900 cursor-pointer hover:bg-gray-50 
-                               rounded-lg p-2 transition-colors"
-                    >
-                      {todo.content}
-                    </p>
-                  )}
+                  <p 
+                    onClick={() => startEditing(todo)}
+                    className="text-gray-900 cursor-pointer hover:bg-gray-50 
+                             rounded-lg p-2 transition-colors"
+                  >
+                    {todo.content}
+                  </p>
                   <div className="flex items-center gap-2 mt-2">
                     <TimerReset size={16} className={timeLeftColor} />
                     <span className={`text-sm font-medium ${timeLeftColor}`}>
@@ -197,6 +149,19 @@ export function TodoList({ todos, onDelete, onComplete, onEdit }: TodoListProps)
           <p className="text-gray-500">添加一个新的待办事项开始计时吧！</p>
         </motion.div>
       )}
+
+      <EditDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => {
+          setIsDrawerOpen(false)
+          setEditingId(null)
+        }}
+        value={editContent}
+        onChange={setEditContent}
+        onSave={handleSave}
+        title="编辑待办事项"
+        placeholder="在这里编辑你的待办事项..."
+      />
     </div>
   )
 }

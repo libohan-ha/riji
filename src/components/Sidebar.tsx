@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { Menu, X, Trophy, ListTodo, LightbulbIcon, Plus, TimerReset, Frown, FolderPlus } from 'lucide-react'
+import { Menu, Trophy, ListTodo, LightbulbIcon, Plus, TimerReset, Frown, FolderPlus } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSidebar } from '../contexts/SidebarContext'
 import { SidebarManager } from './SidebarManager'
@@ -24,7 +24,7 @@ export function Sidebar() {
         onClick={toggleSidebar}
         aria-label={isOpen ? '关闭侧边栏' : '打开侧边栏'}
       >
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
+        {isOpen ? null : <Menu size={24} />}
       </button>
 
       <AnimatePresence mode="wait" initial={false}>
@@ -45,14 +45,14 @@ export function Sidebar() {
               transition={{ duration: 0.2 }}
               className="fixed left-0 top-0 z-40 h-screen w-64 bg-white shadow-lg lg:static lg:z-auto"
             >
-              <SidebarContent onManage={() => setShowManager(true)} />
+              <SidebarContent onManage={() => setShowManager(true)} toggleSidebar={toggleSidebar} />
             </motion.aside>
           </>
         )}
       </AnimatePresence>
 
       <aside className="hidden lg:block w-64 bg-white shadow-lg">
-        <SidebarContent onManage={() => setShowManager(true)} />
+        <SidebarContent onManage={() => setShowManager(true)} toggleSidebar={toggleSidebar} />
       </aside>
 
       <AnimatePresence>
@@ -66,9 +66,10 @@ export function Sidebar() {
 
 interface SidebarContentProps {
   onManage: () => void
+  toggleSidebar: () => void
 }
 
-function SidebarContent({ onManage }: SidebarContentProps) {
+function SidebarContent({ onManage, toggleSidebar }: SidebarContentProps) {
   const { items } = useSidebar()
   
   return (
@@ -89,6 +90,7 @@ function SidebarContent({ onManage }: SidebarContentProps) {
           <NavLink
             key={item.id}
             to={item.path}
+            onClick={toggleSidebar}
             className={({ isActive }) =>
               `flex items-center space-x-2 rounded-lg px-2 py-2 hover:bg-slate-100 ${
                 isActive ? 'bg-slate-100 font-medium' : ''
@@ -104,6 +106,7 @@ function SidebarContent({ onManage }: SidebarContentProps) {
           <NavLink
             key={item.id}
             to={`/folder/${item.label}`}
+            onClick={toggleSidebar}
             className={({ isActive }) =>
               `flex items-center space-x-2 rounded-lg px-2 py-2 hover:bg-slate-100 ${
                 isActive ? 'bg-slate-100 font-medium' : ''

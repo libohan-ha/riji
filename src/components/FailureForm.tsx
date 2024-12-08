@@ -3,6 +3,7 @@ import { PlusCircle } from 'lucide-react'
 import { Failure } from '../types'
 import { motion } from 'framer-motion'
 import TextareaAutosize from 'react-textarea-autosize'
+import { toast } from 'sonner'
 
 interface FailureFormProps {
   onSubmit: (failure: Failure) => void
@@ -25,6 +26,7 @@ export function FailureForm({ onSubmit }: FailureFormProps) {
 
     onSubmit(failure)
     setContent('')
+    toast.success('已记录')
   }
 
   return (

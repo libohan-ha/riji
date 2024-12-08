@@ -1,8 +1,8 @@
-import { BookX, Trash2, X, Check } from 'lucide-react'
+import { BookX, Trash2 } from 'lucide-react'
 import { Failure } from '../types'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import TextareaAutosize from 'react-textarea-autosize'
+import { EditDrawer } from './EditDrawer'
 
 interface FailureListProps {
   failures: Failure[]
@@ -13,6 +13,7 @@ interface FailureListProps {
 export function FailureList({ failures, onDelete, onEdit }: FailureListProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editContent, setEditContent] = useState('')
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   const sortedFailures = [...failures].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -39,29 +40,15 @@ export function FailureList({ failures, onDelete, onEdit }: FailureListProps) {
   const startEditing = (failure: Failure) => {
     setEditingId(failure.id)
     setEditContent(failure.content)
+    setIsDrawerOpen(true)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      finishEditing()
-    }
-    if (e.key === 'Escape') {
-      cancelEditing()
-    }
-  }
-
-  const finishEditing = () => {
+  const handleSave = () => {
     if (editingId && onEdit && editContent.trim()) {
       onEdit(editingId, editContent.trim())
       setEditingId(null)
-      setEditContent('')
+      setIsDrawerOpen(false)
     }
-  }
-
-  const cancelEditing = () => {
-    setEditingId(null)
-    setEditContent('')
   }
 
   if (failures.length === 0) {
@@ -100,48 +87,13 @@ export function FailureList({ failures, onDelete, onEdit }: FailureListProps) {
                     <BookX className="text-rose-500" size={24} />
                   </div>
                   <div className="flex-1">
-                    {editingId === failure.id ? (
-                      <div className="space-y-4">
-                        <TextareaAutosize
-                          value={editContent}
-                          onChange={(e) => setEditContent(e.target.value)}
-                          onKeyDown={handleKeyDown}
-                          className="w-full text-gray-800 bg-white/50 rounded-lg p-2 
-                                   focus:outline-none focus:ring-2 focus:ring-rose-500 
-                                   border border-gray-200 resize-none"
-                          placeholder="发生了什么？"
-                          minRows={1}
-                        />
-                        <div className="flex gap-2">
-                          <button
-                            onClick={cancelEditing}
-                            className="flex items-center gap-1 px-3 py-1 rounded-lg
-                                     bg-gray-200 text-gray-600 hover:bg-gray-300
-                                     transition-colors text-sm"
-                          >
-                            <X size={16} />
-                            取消
-                          </button>
-                          <button
-                            onClick={finishEditing}
-                            className="flex items-center gap-1 px-3 py-1 rounded-lg
-                                     bg-rose-500 text-white hover:bg-rose-600
-                                     transition-colors text-sm"
-                          >
-                            <Check size={16} />
-                            保存
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <p 
-                        className="text-gray-800 text-lg cursor-pointer 
-                                 hover:bg-rose-50 rounded-lg p-2 transition-colors"
-                        onClick={() => startEditing(failure)}
-                      >
-                        {failure.content}
-                      </p>
-                    )}
+                    <p 
+                      className="text-gray-800 text-lg cursor-pointer 
+                               hover:bg-rose-50 rounded-lg p-2 transition-colors"
+                      onClick={() => startEditing(failure)}
+                    >
+                      {failure.content}
+                    </p>
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.1 }}
@@ -158,6 +110,19 @@ export function FailureList({ failures, onDelete, onEdit }: FailureListProps) {
           </AnimatePresence>
         </div>
       ))}
+
+      <EditDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => {
+          setIsDrawerOpen(false)
+          setEditingId(null)
+        }}
+        value={editContent}
+        onChange={setEditContent}
+        onSave={handleSave}
+        title="编辑失败记录"
+        placeholder="在这里编辑你的失败记录..."
+      />
     </div>
   )
 }

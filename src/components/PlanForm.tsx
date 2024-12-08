@@ -3,6 +3,7 @@ import { ListPlus } from 'lucide-react'
 import { Plan } from '../types'
 import { motion } from 'framer-motion'
 import TextareaAutosize from 'react-textarea-autosize'
+import { toast } from 'sonner'
 
 interface PlanFormProps {
   onSubmit: (plan: Plan) => void
@@ -28,6 +29,7 @@ export function PlanForm({ onSubmit }: PlanFormProps) {
 
     onSubmit(plan)
     setContent('')
+    toast.success('计划已添加')
   }
 
   return (

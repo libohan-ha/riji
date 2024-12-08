@@ -4,6 +4,7 @@ import { Achievement } from '../types'
 import { motion } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import TextareaAutosize from 'react-textarea-autosize'
+import { toast } from 'sonner'
 
 interface AchievementFormProps {
   onSubmit: (achievement: Achievement) => void
@@ -26,6 +27,7 @@ export function AchievementForm({ onSubmit }: AchievementFormProps) {
 
     onSubmit(achievement)
     setContent('')
+    toast.success('成就已记录')
 
     confetti({
       particleCount: 100,

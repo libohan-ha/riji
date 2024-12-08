@@ -2,7 +2,7 @@ import { Trash2, Circle, CheckCircle2 } from 'lucide-react'
 import { Plan } from '../types'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import TextareaAutosize from 'react-textarea-autosize'
+import { EditDrawer } from './EditDrawer'
 
 interface PlanListProps {
   plans: Plan[]
@@ -14,32 +14,20 @@ interface PlanListProps {
 export function PlanList({ plans, onDelete, onToggle, onEdit }: PlanListProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editContent, setEditContent] = useState('')
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   const startEditing = (plan: Plan) => {
     setEditingId(plan.id)
     setEditContent(plan.content)
+    setIsDrawerOpen(true)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      finishEditing()
-    }
-    if (e.key === 'Escape') {
-      cancelEditing()
-    }
-  }
-
-  const finishEditing = () => {
+  const handleSave = () => {
     if (editingId && editContent.trim() && onEdit) {
       onEdit(editingId, editContent.trim())
       setEditingId(null)
+      setIsDrawerOpen(false)
     }
-  }
-
-  const cancelEditing = () => {
-    setEditingId(null)
-    setEditContent('')
   }
 
   return (
@@ -76,30 +64,15 @@ export function PlanList({ plans, onDelete, onToggle, onEdit }: PlanListProps) {
                 )}
               </button>
               <div className="flex-1">
-                {editingId === plan.id ? (
-                  <TextareaAutosize
-                    minRows={1}
-                    maxRows={5}
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                    onBlur={finishEditing}
-                    onKeyDown={handleKeyDown}
-                    className="w-full rounded-lg border border-blue-300 px-3 py-2
-                             focus:outline-none focus:ring-2 focus:ring-blue-500
-                             resize-none bg-white/50"
-                    autoFocus
-                  />
-                ) : (
-                  <p 
-                    className={`transition-all duration-300 cursor-pointer 
-                              hover:bg-gray-50 rounded-lg p-2 ${
-                      plan.completed ? 'line-through text-gray-500' : 'text-gray-900'
-                    }`}
-                    onClick={() => !plan.completed && startEditing(plan)}
-                  >
-                    {plan.content}
-                  </p>
-                )}
+                <p 
+                  className={`transition-all duration-300 cursor-pointer 
+                            hover:bg-gray-50 rounded-lg p-2 ${
+                    plan.completed ? 'line-through text-gray-500' : 'text-gray-900'
+                  }`}
+                  onClick={() => !plan.completed && startEditing(plan)}
+                >
+                  {plan.content}
+                </p>
               </div>
               <button
                 onClick={() => onDelete(plan.id)}
@@ -112,6 +85,19 @@ export function PlanList({ plans, onDelete, onToggle, onEdit }: PlanListProps) {
           </motion.div>
         ))}
       </AnimatePresence>
+
+      <EditDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => {
+          setIsDrawerOpen(false)
+          setEditingId(null)
+        }}
+        value={editContent}
+        onChange={setEditContent}
+        onSave={handleSave}
+        title="编辑计划"
+        placeholder="在这里编辑你的计划..."
+      />
     </div>
   )
 }

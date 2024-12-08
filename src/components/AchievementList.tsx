@@ -2,7 +2,7 @@ import { Trophy, Trash2, Heart, Star, Flame, ThumbsUp } from 'lucide-react'
 import { Achievement } from '../types'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import TextareaAutosize from 'react-textarea-autosize'
+import { EditDrawer } from './EditDrawer'
 
 interface AchievementListProps {
   achievements: Achievement[]
@@ -25,6 +25,7 @@ export function AchievementList({ achievements, onDelete, onEdit }: AchievementL
   const [selectedReactions, setSelectedReactions] = useState<Record<string, number>>({})
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editContent, setEditContent] = useState('')
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   const streak = calculateStreak(achievements)
 
@@ -71,22 +72,14 @@ export function AchievementList({ achievements, onDelete, onEdit }: AchievementL
   const startEditing = (achievement: Achievement) => {
     setEditingId(achievement.id)
     setEditContent(achievement.content)
+    setIsDrawerOpen(true)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      finishEditing()
-    }
-    if (e.key === 'Escape') {
-      setEditingId(null)
-    }
-  }
-
-  const finishEditing = () => {
+  const handleSave = () => {
     if (editingId && editContent.trim() && onEdit) {
       onEdit(editingId, editContent.trim())
       setEditingId(null)
+      setIsDrawerOpen(false)
     }
   }
 
@@ -126,26 +119,12 @@ export function AchievementList({ achievements, onDelete, onEdit }: AchievementL
                     <Trophy className="text-yellow-500" size={24} />
                   </div>
                   <div className="flex-1">
-                    {editingId === achievement.id ? (
-                      <TextareaAutosize
-                        value={editContent}
-                        onChange={(e) => setEditContent(e.target.value)}
-                        onBlur={finishEditing}
-                        onKeyDown={handleKeyDown}
-                        autoFocus
-                        className="w-full text-gray-800 text-lg bg-white/50 rounded-lg p-2 
-                                 focus:outline-none focus:ring-2 focus:ring-blue-500 
-                                 border border-gray-200 resize-none"
-                        minRows={1}
-                      />
-                    ) : (
-                      <p 
-                        className="text-gray-800 text-lg cursor-pointer hover:bg-white/50 rounded-lg p-2 transition-colors"
-                        onClick={() => startEditing(achievement)}
-                      >
-                        {achievement.content}
-                      </p>
-                    )}
+                    <p 
+                      className="text-gray-800 text-lg cursor-pointer hover:bg-white/50 rounded-lg p-2 transition-colors"
+                      onClick={() => startEditing(achievement)}
+                    >
+                      {achievement.content}
+                    </p>
                     <div className="flex gap-2 mt-4">
                       {reactions.map((Reaction, index) => (
                         <motion.button
@@ -178,6 +157,19 @@ export function AchievementList({ achievements, onDelete, onEdit }: AchievementL
           </AnimatePresence>
         </div>
       ))}
+
+      <EditDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => {
+          setIsDrawerOpen(false)
+          setEditingId(null)
+        }}
+        value={editContent}
+        onChange={setEditContent}
+        onSave={handleSave}
+        title="编辑成就"
+        placeholder="在这里编辑你的成就..."
+      />
     </div>
   )
 }
